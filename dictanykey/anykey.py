@@ -1,84 +1,66 @@
-from typing import Any, Iterator, Mapping
+from typing import Any, Mapping, Optional, Iterable
 from dictanykey.iterables import DictItems, DictKeys, DictValues, OrderedKeys
 
 from dictanykey.unhashmap import UnHashMap
+from dictanykey.utils import quote_string
+from dictanykey.mapping_mixin import MappingMixin
 
-            
-class DictAnyKey:
-    """A dictionary where the keys don't need to be hashable"""
-    def __init__(self, data=None) -> None:
-        # Store hashable keys in _hashmap: dict
-        self._hashmap = {}
-        # Store unhashble keys in _unhashmap: UnHashMap
+
+class DictAnyKey(MappingMixin):
+    """A dictionary where the keys don't need to be hashable
+       Stores hashable keys with values in _hashmap: dict
+       Stores unhashable keys with values in _unhashmap: UnHashMap
+
+       Maintains order of items inserted.
+
+       Unhashable key lookups are slower than built in dict.
+       Hashable key lookups are the same speed as built in dict.
+    """
+    def __init__(self, data: Optional[Iterable] = None) -> None:
+        self._hashmap: dict = {}
         self._unhashmap = UnHashMap()
-        # keep track of order of keys in _keys: OrderedKeys
         self._keys = OrderedKeys([])
-        # pull out items if data is Mapping
         if isinstance(data, Mapping):
             data = data.items()
-        # unpack key, value from data
         if data is not None:
             for key, value in data:
                 self[key] = value
                 self._keys.add(key)
             
-    def __contains__(self, value) -> bool:
-        return value in self.keys()
+    def __contains__(self, value: Any) -> bool:
+        inhashmap: bool = value in self._hashmap
+        if inhashmap:
+            return True
+        return value in self._unhashmap
     
-    def __setitem__(self, key, value) -> None:
+    def __setitem__(self, key: Any, value: Any) -> None:
         try:
             self._hashmap[key] = value
         except TypeError:
             self._unhashmap[key] = value
         self._keys.add(key)
         
-    
-    def __getitem__(self, key) -> Any:
-        return self.get(key)
-        
-    def __delitem__(self, key) -> None:
+    def __delitem__(self, key: Any) -> None:
         try:
             del self._hashmap[key]
         except (KeyError, TypeError):
             del self._unhashmap[key]
         self._keys.delete(key)
-        
+
     def __repr__(self) -> str:
-        d = ', '.join(f'{key}: {value}' for key, value in self.items())
-        return '{' + f'{d}' + '}'
+        return f'DictAnyKey({[(key, value) for key, value in self.items()]})'
     
-    def __iter__(self) -> Iterator:
-        return iter(self.keys())
-    
-    def __len__(self) -> int:
-        return len(self.keys())
-    
-    def __eq__(self, other) -> bool:
-        if len(self) != len(other):
-            return False
-        for key in self.keys():
-            if key not in other:
-                return False
-            if self[key] != other[key]:
-                return False
-        return True
-    
-    def keys(self):
+    def keys(self) -> DictKeys:
         return DictKeys([key for key in self._keys])
     
-    def values(self):
+    def values(self) -> DictValues:
         return DictValues([self[key] for key in self._keys])
     
-    def items(self):
+    def items(self) -> DictItems:
         return DictItems([(key, self[key]) for key in self._keys])
     
-    def get(self, key, default=None):
+    def get(self, key: Any, default: Optional[Any] = None) -> Any:
         try:
             return self._hashmap.get(key)
         except TypeError:
             return self._unhashmap.get(key, default)
-    
-    def copy(self):
-        copy = self.__new__(type(self))
-        copy.__init__(self.items())
-        return copy

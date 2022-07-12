@@ -1,22 +1,22 @@
-from typing import Iterable, Iterator
+from typing import Iterable, Iterator, Any
 
 from dictanykey.iterators import DictItemIterator, DictKeyIterator, DictValueIterator
 
 
 class DictKeys:
-    def __init__(self, keys: Iterable):
+    def __init__(self, keys: Iterable) -> None:
         self.keys = keys
 
     def __len__(self):
         return len(self.keys)
 
-    def __contains__(self, key):
+    def __contains__(self, key: Any) -> bool:
         return key in self.keys
 
-    def __iter__(self):
+    def __iter__(self) -> DictKeyIterator:
         return DictKeyIterator(self.keys)
     
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f'DictKeys({self.keys})'
     
     
