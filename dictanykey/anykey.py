@@ -2,7 +2,6 @@ from typing import Any, Mapping, Optional, Iterable
 from dictanykey.iterables import DictItems, DictKeys, DictValues, OrderedKeys
 
 from dictanykey.unhashmap import UnHashMap
-from dictanykey.utils import quote_string
 from dictanykey.mapping_mixin import MappingMixin
 
 
@@ -19,7 +18,7 @@ class DictAnyKey(MappingMixin):
     def __init__(self, data: Optional[Iterable] = None) -> None:
         self._hashmap: dict = {}
         self._unhashmap = UnHashMap()
-        self._keys = OrderedKeys([])
+        self._keys = OrderedKeys()
         if isinstance(data, Mapping):
             data = data.items()
         if data is not None:
@@ -28,10 +27,7 @@ class DictAnyKey(MappingMixin):
                 self._keys.add(key)
             
     def __contains__(self, value: Any) -> bool:
-        inhashmap: bool = value in self._hashmap
-        if inhashmap:
-            return True
-        return value in self._unhashmap
+        return value in self._keys
     
     def __setitem__(self, key: Any, value: Any) -> None:
         try:
@@ -60,7 +56,13 @@ class DictAnyKey(MappingMixin):
         return DictItems([(key, self[key]) for key in self._keys])
     
     def get(self, key: Any, default: Optional[Any] = None) -> Any:
+        if key not in self.keys():
+            return default
         try:
-            return self._hashmap.get(key)
-        except TypeError:
-            return self._unhashmap.get(key, default)
+            return self._hashmap[key]
+        except (KeyError, TypeError):
+            try:
+                return self._unhashmap[key]
+            except KeyError:
+                return default
+

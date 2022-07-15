@@ -2,9 +2,12 @@ from typing import Iterator, Mapping
 from dictanykey.utils import quote_string
 
 
-class MappingMixin(Mapping):
+class MappingMixin:
     def __getitem__(self, key):
-        return self.get(key)
+        if key in self.keys():
+            return self.get(key)
+        else:
+            raise KeyError(key)
 
     def __str__(self) -> str:
         d = ', '.join(f'{quote_string(key)}: {quote_string(value)}' for key, value in self.items())
@@ -14,7 +17,7 @@ class MappingMixin(Mapping):
         return iter(self.keys())
 
     def __eq__(self, other: Mapping) -> bool:
-        if not isinstance(other, Mapping):
+        if not {'__len__', '__contains__', '__getitem__'}.issubset(dir(other)):
             return False
         if len(self) != len(other):
             return False

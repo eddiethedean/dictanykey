@@ -1,4 +1,4 @@
-from typing import Iterable, Iterator, Any
+from typing import Iterable, Iterator, Any, Optional
 
 from dictanykey.iterators import DictItemIterator, DictKeyIterator, DictValueIterator
 
@@ -55,8 +55,8 @@ class DictItems:
 
 
 class OrderedKeys:
-    def __init__(self, keys: Iterable) -> None:
-        self.keys = list(keys)
+    def __init__(self, keys: Optional[Iterable] = None) -> None:
+        self.keys: list = list(keys) if keys is not None else []
         
     def add(self, key):
         if key not in self.keys:

@@ -1,0 +1,9 @@
+notebooks/
+dictanykey.egg-info/
+dictanykey/__pycache__/
+dist/
+build/
+.vscode/
+.ipynb_checkpoints/
+__pycache__/
+tests/__pycache__/
