@@ -67,4 +67,14 @@ class UnHashMap(MappingMixin):
                 return default
         return self._values[i]
     
+    # TODO: update method
+
+    # TODO: pop method
+
+    # TODO: popitem method
+
+    # TODO: clear method
+
+    # TODO: setdefault method
     
+    # TODO: fromkeys method

@@ -66,3 +66,14 @@ class DictAnyKey(MappingMixin):
             except KeyError:
                 return default
 
+    # TODO: update method
+
+    # TODO: pop method
+
+    # TODO: popitem method
+
+    # TODO: clear method
+
+    # TODO: setdefault method
+    
+    # TODO: fromkeys method
