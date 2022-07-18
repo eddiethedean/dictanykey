@@ -1,4 +1,4 @@
-from typing import Iterator, Mapping
+from typing import Any, Iterable, Iterator, Mapping, Optional
 from dictanykey.utils import quote_string
 
 
@@ -35,3 +35,27 @@ class MappingMixin:
         copy = self.__new__(type(self))
         copy.__init__(self.items())
         return copy
+
+    def setdefault(self, key, default: Optional[Any] = None) -> Any:
+        """Insert key with a value of default if key is not in the dictionary.
+
+           Return the value for key if key is in the dictionary, else default.
+        """
+        if key not in self:
+            self[key] = default
+            return default
+        return key
+
+    def update(self, data: Optional[Iterable] = None) -> None:
+        """Update self from dict/iterable data.
+           If data is present and has a .keys() method, then does:  for k in data: self[k] = data[k]
+           If data is present and lacks a .keys() method, then does:  for k, v in data: self[k] = v
+        """
+        if data is None:
+            return
+        if {'__setitem__', 'keys'}.issubset(dir(data)):
+            for k in data.keys():
+                self[k] = data[k]
+        else:
+            for k, v in data:
+                self[k] = v

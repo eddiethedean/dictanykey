@@ -19,13 +19,8 @@ class DictAnyKey(MappingMixin):
         self._hashmap: dict = {}
         self._unhashmap = UnHashMap()
         self._keys = OrderedKeys()
-        if isinstance(data, Mapping):
-            data = data.items()
-        if data is not None:
-            for key, value in data:
-                self[key] = value
-                self._keys.add(key)
-            
+        self.update(data)
+        
     def __contains__(self, value: Any) -> bool:
         return value in self._keys
     
@@ -50,10 +45,10 @@ class DictAnyKey(MappingMixin):
         return DictKeys([key for key in self._keys])
     
     def values(self) -> DictValues:
-        return DictValues([self[key] for key in self._keys])
+        return DictValues([self[key] for key in self.keys()])
     
     def items(self) -> DictItems:
-        return DictItems([(key, self[key]) for key in self._keys])
+        return DictItems([(key, self[key]) for key in self.keys()])
     
     def get(self, key: Any, default: Optional[Any] = None) -> Any:
         if key not in self.keys():
@@ -66,14 +61,16 @@ class DictAnyKey(MappingMixin):
             except KeyError:
                 return default
 
-    # TODO: update method
-
     # TODO: pop method
 
     # TODO: popitem method
 
-    # TODO: clear method
+    def clear(self):
+        self._hashmap: dict = {}
+        self._unhashmap = UnHashMap()
+        self._keys = OrderedKeys()
 
     # TODO: setdefault method
+    
     
     # TODO: fromkeys method
