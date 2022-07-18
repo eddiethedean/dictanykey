@@ -71,10 +71,14 @@ class UnHashMap(MappingMixin):
         except KeyError:
             return default
         return self._values[i]
+    
+    def clear(self):
+        self._keys: list = []
+        self._values: list = []
 
     # TODO: pop method
     def pop(self, key, default=None):
-        ...
+        raise NotImplementedError
     """Docstring:
        D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 
@@ -83,21 +87,17 @@ class UnHashMap(MappingMixin):
 
     # TODO: popitem method
     def popitem(self):
-        ...
+        raise NotImplementedError
     """Docstring:
        Remove and return a (key, value) pair as a 2-tuple.
 
        Pairs are returned in LIFO (last-in, first-out) order.
        Raises KeyError if the dict is empty.
     """
-
-    def clear(self):
-        self._keys: list = []
-        self._values: list = []
     
-    def fromkeys(iterable, value=None):
-        ...
     # TODO: fromkeys method
+    def fromkeys(iterable, value=None):
+        raise NotImplementedError
     """Signature: d.fromkeys(iterable, value=None, /)
        Docstring: Create a new dictionary with keys from iterable and values set to value.
     """
