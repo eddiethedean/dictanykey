@@ -4,6 +4,9 @@ from dictanykey.iterators import DictItemIterator, DictKeyIterator, DictValueIte
 
 
 class AnyKeyMapping(Protocol):
+    def __len__(self) -> int:
+        ...
+        
     def _get_keys_list(self) -> list:
         ...
 

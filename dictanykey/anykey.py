@@ -71,27 +71,34 @@ class DictAnyKey(MappingMixin):
         self._keys = OrderedKeys()
 
     # TODO: pop method
-    def pop(self, key, default=None):
-        raise NotImplementedError
-    """Docstring:
-       D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
+    def pop(self, key: Any, default=None):
+        """Docstring:
+        D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 
-       If key is not found, default is returned if given, otherwise KeyError is raised
-    """
+        If key is not found, default is returned if given, otherwise KeyError is raised
+        """
+        try:
+            value = self[key]
+        except KeyError as e:
+            if default is None:
+                raise e
+            else:
+                return default
+        del self[key]
 
     # TODO: popitem method
     def popitem(self):
         raise NotImplementedError
-    """Docstring:
-       Remove and return a (key, value) pair as a 2-tuple.
+        """Docstring:
+        Remove and return a (key, value) pair as a 2-tuple.
 
-       Pairs are returned in LIFO (last-in, first-out) order.
-       Raises KeyError if the dict is empty.
-    """
+        Pairs are returned in LIFO (last-in, first-out) order.
+        Raises KeyError if the dict is empty.
+        """
 
     # TODO: fromkeys method
-    def fromkeys(iterable, value=None):
+    def fromkeys(iterable, value: Optional[Any] = None):
         raise NotImplementedError
-    """Signature: d.fromkeys(iterable, value=None, /)
-       Docstring: Create a new dictionary with keys from iterable and values set to value.
-    """
+        """Signature: d.fromkeys(iterable, value=None, /)
+        Docstring: Create a new dictionary with keys from iterable and values set to value.
+        """
