@@ -30,9 +30,9 @@ class DefaultMixin:
             name = self.default_factory.__name__
         except AttributeError:
             name = self.default_factory
-        return f'{type(self).__name__}({name}, {[(key, value) for key, value in self.items()]})'
+        return f'{type(self).__name__}({name}, {[(key, value) for key, value in self._get_items_list()]})'
 
     def copy(self):
         copy = self.__new__(type(self))
-        copy.__init__(self.default_factory, self.items())
+        copy.__init__(self.default_factory, self._get_items_list())
         return copy

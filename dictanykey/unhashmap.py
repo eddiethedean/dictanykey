@@ -1,4 +1,4 @@
-from typing import Mapping, Any, Iterable, Optional
+from typing import Generator, Mapping, Any, Iterable, Optional
 from dictanykey.iterables import DictItems, DictKeys, DictValues
 
 from dictanykey.mapping_mixin import MappingMixin
@@ -22,11 +22,11 @@ class UnHashMap(MappingMixin):
 
     def __contains__(self, value: Any) -> bool:
         """True if the dictionary has the specified key, else False."""
-        return value in self.keys()
+        return value in self._keys
             
     def __setitem__(self, key: Any, value: Any) -> None:
         """Set self[key] to value."""
-        if key not in self.keys():
+        if key not in self._keys:
             self._keys.append(key)
             self._values.append(value)
         else:
@@ -41,6 +41,9 @@ class UnHashMap(MappingMixin):
             return self._keys.index(key)
         except ValueError as e:
             raise KeyError(key)
+
+    def _get_keys_list(self) -> list[Any]:
+        return self._keys
         
     def __delitem__(self, key: Any) -> None:
         """Delete self[key]."""
@@ -50,7 +53,7 @@ class UnHashMap(MappingMixin):
 
     def __repr__(self) -> str:
         """Return repr(self)."""
-        return f'UnHashMap({[(key, value) for key, value in self.items()]})'
+        return f'UnHashMap({[(key, value) for key, value in self._get_items_list()]})'
     
     def keys(self) -> DictKeys:
         """Returns a set-like object providing a view on self's keys"""

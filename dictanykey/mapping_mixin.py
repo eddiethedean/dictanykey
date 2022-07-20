@@ -3,8 +3,8 @@ from dictanykey.utils import quote_string
 
 
 class MappingMixin:
-    def __getitem__(self, key):
-        if key in self.keys():
+    def __getitem__(self, key: Any) -> Any:
+        if key in self._get_keys_list():
             return self.get(key)
         else:
             raise KeyError(key)
@@ -30,6 +30,12 @@ class MappingMixin:
 
     def __len__(self) -> int:
         return len(self.keys())
+
+    def _get_values_list(self) -> list[Any]:
+        return [self[key] for key in self._get_keys_list()]
+
+    def _get_items_list(self) -> list[tuple]:
+        return [(key, self[key]) for key in self._get_keys_list()]
 
     def copy(self):
         copy = self.__new__(type(self))

@@ -1,4 +1,4 @@
-from typing import Any, Mapping, Optional, Iterable
+from typing import Any, Generator, Mapping, Optional, Iterable
 from dictanykey.iterables import DictItems, DictKeys, DictValues, OrderedKeys
 
 from dictanykey.unhashmap import UnHashMap
@@ -39,19 +39,23 @@ class DictAnyKey(MappingMixin):
         self._keys.delete(key)
 
     def __repr__(self) -> str:
-        return f'DictAnyKey({[(key, value) for key, value in self.items()]})'
+        return f'DictAnyKey({[(key, value) for key, value in self._get_items_list()]})'
+
+    def _get_keys_list(self) -> list[Any]:
+        return list(self._keys)
     
     def keys(self) -> DictKeys:
         return DictKeys([key for key in self._keys])
     
     def values(self) -> DictValues:
-        return DictValues([self[key] for key in self.keys()])
+        return DictValues([self[key] for key in self._get_keys_list()])
     
     def items(self) -> DictItems:
-        return DictItems([(key, self[key]) for key in self.keys()])
+        return DictItems([(key, self[key]) for key in self._get_keys_list()])
     
     def get(self, key: Any, default: Optional[Any] = None) -> Any:
-        if key not in self.keys():
+        """Return the value for key if key is in the dictionary, else default."""
+        if key not in self._get_keys_list():
             return default
         try:
             return self._hashmap[key]
