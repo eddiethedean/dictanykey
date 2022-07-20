@@ -1,4 +1,4 @@
-from typing import Any, Generator, Mapping, Optional, Iterable
+from typing import Any, Optional, Iterable
 from dictanykey.iterables import DictItems, DictKeys, DictValues, OrderedKeys
 
 from dictanykey.unhashmap import UnHashMap
@@ -45,13 +45,13 @@ class DictAnyKey(MappingMixin):
         return list(self._keys)
     
     def keys(self) -> DictKeys:
-        return DictKeys([key for key in self._keys])
+        return DictKeys(self)
     
     def values(self) -> DictValues:
-        return DictValues([self[key] for key in self._get_keys_list()])
+        return DictValues(self)
     
     def items(self) -> DictItems:
-        return DictItems([(key, self[key]) for key in self._get_keys_list()])
+        return DictItems(self)
     
     def get(self, key: Any, default: Optional[Any] = None) -> Any:
         """Return the value for key if key is in the dictionary, else default."""

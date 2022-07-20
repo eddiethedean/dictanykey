@@ -1,25 +1,44 @@
-from typing import Iterable
+from typing import Any, Iterator, Protocol
 
 
-class DictKeyIterator:
-    def __init__(self, keys: Iterable):
-        self.keys = iter(keys)
-        
-    def __next__(self):
-        return next(self.keys)
+class AnyKeyMapping(Protocol):
+    def __len__(self) -> int:
+        ...
+
+    def _get_keys_list(self) -> list:
+        ...
+
+    def _get_values_list(self) -> list:
+        ...
+
+    def _get_items_list(self) -> list[tuple]:
+        ...
+
+
+class ViewIterator:
+    def __init__(self, parent: AnyKeyMapping) -> None:
+        self.parent: AnyKeyMapping = parent
+        self.len: int = len(parent)
+
+    def __next__(self) -> Any:
+        if len(self.parent) != self.len:
+            raise RuntimeError('dictionary changed size during iteration')
+        return next(self.iterator)
+
+
+class DictKeyIterator(ViewIterator):
+    def __init__(self, parent: AnyKeyMapping) -> None:
+        super().__init__(parent)
+        self.iterator: Iterator = iter(parent._get_keys_list())
     
     
-class DictValueIterator:
-    def __init__(self, values: Iterable):
-        self.values = iter(values)
-        
-    def __next__(self):
-        return next(self.values)
+class DictValueIterator(ViewIterator):
+    def __init__(self, parent: AnyKeyMapping) -> None:
+        super().__init__(parent)
+        self.iterator: Iterator = iter(parent._get_values_list())
     
     
-class DictItemIterator:
-    def __init__(self, items):
-        self.items = iter(items)
-        
-    def __next__(self) -> tuple:
-        return next(self.items)
+class DictItemIterator(ViewIterator):
+    def __init__(self, parent: AnyKeyMapping):
+        super().__init__(parent)
+        self.iterator: Iterator = iter(parent._get_items_list())

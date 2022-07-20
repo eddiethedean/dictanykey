@@ -1,4 +1,4 @@
-from typing import Generator, Mapping, Any, Iterable, Optional
+from typing import Any, Iterable, Optional
 from dictanykey.iterables import DictItems, DictKeys, DictValues
 
 from dictanykey.mapping_mixin import MappingMixin
@@ -57,15 +57,15 @@ class UnHashMap(MappingMixin):
     
     def keys(self) -> DictKeys:
         """Returns a set-like object providing a view on self's keys"""
-        return DictKeys(self._keys)
+        return DictKeys(self)
     
     def values(self) -> DictValues:
         """Returns an object providing a view on self's values"""
-        return DictValues(self._values)
+        return DictValues(self)
     
     def items(self) -> DictItems:
         """Returns set-like object providing a view on self's items"""
-        return DictItems([(key, value) for key, value in zip(self._keys, self._values)])
+        return DictItems(self)
     
     def get(self, key, default: Optional[Any] = None) -> Any:
         """Return the value for key if key is in the dictionary, else default."""

@@ -10,7 +10,7 @@ class MappingMixin:
             raise KeyError(key)
 
     def __str__(self) -> str:
-        d = ', '.join(f'{quote_string(key)}: {quote_string(value)}' for key, value in self.items())
+        d = ', '.join(f'{quote_string(key)}: {quote_string(value)}' for key, value in self._get_items_list())
         return '{' + f'{d}' + '}'
 
     def __iter__(self) -> Iterator:
@@ -29,7 +29,7 @@ class MappingMixin:
         return True
 
     def __len__(self) -> int:
-        return len(self.keys())
+        return len(self._get_keys_list())
 
     def _get_values_list(self) -> list[Any]:
         return [self[key] for key in self._get_keys_list()]
@@ -39,7 +39,7 @@ class MappingMixin:
 
     def copy(self):
         copy = self.__new__(type(self))
-        copy.__init__(self.items())
+        copy.__init__(self._get_items_list())
         return copy
 
     def setdefault(self, key, default: Optional[Any] = None) -> Any:
@@ -60,7 +60,7 @@ class MappingMixin:
         if data is None:
             return
         if {'__setitem__', 'keys'}.issubset(dir(data)):
-            for k in data.keys():
+            for k in data._get_keys_list():
                 self[k] = data[k]
         else:
             for k, v in data:

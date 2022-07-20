@@ -1,57 +1,59 @@
-from typing import Iterable, Iterator, Any, Optional
+from typing import Iterable, Iterator, Any, Optional, Protocol
 
 from dictanykey.iterators import DictItemIterator, DictKeyIterator, DictValueIterator
 
 
-class DictKeys:
-    def __init__(self, keys: Iterable) -> None:
-        self.keys = keys
+class AnyKeyMapping(Protocol):
+    def _get_keys_list(self) -> list:
+        ...
 
-    def __len__(self):
-        return len(self.keys)
+    def _get_values_list(self) -> list:
+        ...
+
+    def _get_items_list(self) -> list[tuple]:
+        ...
+
+
+class View:
+    def __init__(self, parent: AnyKeyMapping) -> None:
+        self.parent = parent
+
+    def __len__(self) -> int:
+        return len(self.parent._get_keys_list())
+
+
+class DictKeys(View):
 
     def __contains__(self, key: Any) -> bool:
-        return key in self.keys
+        return key in self.parent._get_keys_list()
 
     def __iter__(self) -> DictKeyIterator:
-        return DictKeyIterator(self.keys)
+        return DictKeyIterator(self.parent)
     
     def __repr__(self) -> str:
-        return f'DictKeys({self.keys})'
+        return f'DictKeys({self.parent._get_keys_list()})'
     
     
-class DictValues:
-    def __init__(self, values: Iterable):
-        self.values = values
-
-    def __len__(self):
-        return len(self.values)
-
+class DictValues(View):
     def __contains__(self, value):
-        return value in self.values
+        return value in self.parent._get_values_list()
 
     def __iter__(self):
-        return DictValueIterator(self.values)
+        return DictValueIterator(self.parent)
     
     def __repr__(self):
-        return f'DictValues({self.values})'
+        return f'DictValues({self.parent._get_values_list()})'
     
     
-class DictItems:
-    def __init__(self, items: Iterable):
-        self.items = items
-
-    def __len__(self):
-        return len(self.items)
-
+class DictItems(View):
     def __contains__(self, item):
-        return item in self.items
+        return item in self.parent._get_items_list()
 
     def __iter__(self):
-        return DictItemIterator(self.items)
+        return DictItemIterator(self.parent)
     
     def __repr__(self):
-        return f'DictItems({self.items})'
+        return f'DictItems({self.parent._get_items_list()})'
 
 
 class OrderedKeys:
@@ -68,4 +70,4 @@ class OrderedKeys:
             del self.keys[i]
             
     def __iter__(self) -> Iterator:
-        return DictKeyIterator(self.keys)
+        return iter(self.keys)
