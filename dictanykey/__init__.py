@@ -1,2 +1,2 @@
-from dictanykey.anykey import DictAnyKey
-from dictanykey.defaultdictanykey import DefaultDictAnyKey
+from dictanykey.dictanykey import DictAnyKey
+from dictanykey.default_dictanykey import DefaultDictAnyKey

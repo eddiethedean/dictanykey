@@ -1,10 +1,9 @@
-from typing import Any, Iterable, Optional
+from typing import Any, Iterable, Iterator, Mapping, Optional
 from dictanykey.iterables import DictItems, DictKeys, DictValues
+from dictanykey.anykey_utils import anykey_copy, anykey_eq, anykey_getitem, anykey_iter, anykey_len, anykey_setdefault, anykey_str, anykey_update
 
-from dictanykey.mapping_mixin import MappingMixin
 
-
-class UnHashMap(MappingMixin):
+class UnHashMap:
     """A dictionary where the keys don't need to be hashable.
        Stores keys in _keys: list
        Stores values in _values: list
@@ -32,6 +31,21 @@ class UnHashMap(MappingMixin):
         else:
             i = self._getindex(key)
             self._values[i] = value
+
+    def __getitem__(self, key: Any) -> Any:
+        return anykey_getitem(self, key)
+
+    def __len__(self) -> int:
+        return anykey_len(self)
+
+    def __str__(self) -> str:
+        return anykey_str(self)
+
+    def __iter__(self) -> Iterator:
+        return anykey_iter(self)
+
+    def __eq__(self, other: Mapping) -> bool:
+        return anykey_eq(self, other)
             
     def _getindex(self, key: Any) -> int:
         """Use _keys.index method to look up and return index of key.
@@ -44,6 +58,12 @@ class UnHashMap(MappingMixin):
 
     def _get_keys_list(self) -> list[Any]:
         return self._keys
+
+    def _get_values_list(self) -> list[Any]:
+        return [self[key] for key in self._get_keys_list()]
+
+    def _get_items_list(self) -> list[tuple]:
+        return [(key, self[key]) for key in self._get_keys_list()]
         
     def __delitem__(self, key: Any) -> None:
         """Delete self[key]."""
@@ -74,33 +94,16 @@ class UnHashMap(MappingMixin):
         except KeyError:
             return default
         return self._values[i]
+
+    def update(self, data) -> None:
+        anykey_update(self, data)
     
     def clear(self):
         self._keys: list = []
         self._values: list = []
 
-    # TODO: pop method
-    def pop(self, key, default=None):
-        raise NotImplementedError
-    """Docstring:
-       D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
+    def copy(self):
+        return anykey_copy(self)
 
-       If key is not found, default is returned if given, otherwise KeyError is raised
-    """
-
-    # TODO: popitem method
-    def popitem(self):
-        raise NotImplementedError
-    """Docstring:
-       Remove and return a (key, value) pair as a 2-tuple.
-
-       Pairs are returned in LIFO (last-in, first-out) order.
-       Raises KeyError if the dict is empty.
-    """
-    
-    # TODO: fromkeys method
-    def fromkeys(iterable, value=None):
-        raise NotImplementedError
-    """Signature: d.fromkeys(iterable, value=None, /)
-       Docstring: Create a new dictionary with keys from iterable and values set to value.
-    """
+    def setdefault(self, key: Any, default: Optional[Any] = None) -> Any:
+        return anykey_setdefault(self, key, default)

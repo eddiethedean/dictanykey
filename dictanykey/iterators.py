@@ -22,6 +22,9 @@ class DictKeyIterator:
         self.len: int = len(parent)
         self.iterator: Iterator = iter(parent._get_keys_list())
 
+    def __iter__(self):
+        return self
+
     def __next__(self) -> Any:
         if len(self.parent) != self.len:
             raise RuntimeError('dictionary changed size during iteration')

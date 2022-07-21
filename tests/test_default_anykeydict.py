@@ -1,13 +1,13 @@
 import unittest
 
-from dictanykey.defaultdictanykey import DefaultDictAnyKey as TestClass
+from dictanykey.default_dictanykey import DefaultDictAnyKey as TestClass
 
 
 class TestInit(unittest.TestCase):
     def test_keys_values(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), ([1, 2], 'one two')])
-        self.assertListEqual([1, 2, [1, 2]], list(d.keys()))
-        self.assertListEqual(['one', 'two', 'one two'], list(d.values()))
+        self.assertListEqual([1, 2, [1, 2]], d._get_keys_list())
+        self.assertListEqual(['one', 'two', 'one two'], d._get_values_list())
 
 
 class TestLen(unittest.TestCase):
@@ -99,26 +99,26 @@ class TestSetItem(unittest.TestCase):
     def test_new(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), ([1, 2], 'one two')])
         d[3] = 'three'
-        self.assertListEqual([1, 2, [1, 2], 3], list(d.keys()))
-        self.assertListEqual(['one', 'two', 'one two', 'three'], list(d.values()))
+        self.assertListEqual([1, 2, [1, 2], 3], d._get_keys_list())
+        self.assertListEqual(['one', 'two', 'one two', 'three'], d._get_values_list())
 
     def test_old(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), ([1, 2], 'one two')])
         d[1] = 'ONE'
-        self.assertListEqual([1, 2, [1, 2]], list(d.keys()))
-        self.assertListEqual(['ONE', 'two', 'one two'], list(d.values()))
+        self.assertListEqual([1, 2, [1, 2]], d._get_keys_list())
+        self.assertListEqual(['ONE', 'two', 'one two'], d._get_values_list())
 
     def test_dict_key_new(self):
         d = TestClass(None, [({1: 'one', 2: 'two'}, 12), ])
         d[{3: 'three', 4: 'four'}] = 34
-        self.assertListEqual([{2: 'two', 1: 'one'}, {4: 'four', 3: 'three'}], list(d.keys()))
-        self.assertListEqual([12, 34], list(d.values()))
+        self.assertListEqual([{2: 'two', 1: 'one'}, {4: 'four', 3: 'three'}], d._get_keys_list())
+        self.assertListEqual([12, 34], d._get_values_list())
 
     def test_dict_key_old(self):
         d = TestClass(None, [({1: 'one', 2: 'two'}, 12), ])
         d[{2: 'two', 1: 'one'}] = 2211
-        self.assertListEqual([{2: 'two', 1: 'one'}], list(d.keys()))
-        self.assertListEqual([2211], list(d.values()))
+        self.assertListEqual([{2: 'two', 1: 'one'}], d._get_keys_list())
+        self.assertListEqual([2211], d._get_values_list())
 
 
 class TestGetItem(unittest.TestCase):
@@ -137,29 +137,29 @@ class TestGetItem(unittest.TestCase):
         value = d[{2: 'TWO', 1: 'ONE'}]
         self.assertEqual(value, 'ONE TWO')
 
-    def test_key_error(self):
+    def test_default_key_error(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), ([1, 2], 'one two'), ({1: 'ONE', 2: 'TWO'}, 'ONE TWO')])
         with self.assertRaises(KeyError):
             value = d[3]
         with self.assertRaises(KeyError):
             value = d[{1: 'ONE'}]
 
-    def test_hashable(self):
+    def test_default_hashable(self):
         d = TestClass(list, [(1, 'one'), (2, 'two'), ([1, 2], 'one two'), ({1: 'ONE', 2: 'TWO'}, 'ONE TWO')])
         value = d[1]
         self.assertEqual(value, 'one')
 
-    def test_unhashable(self):
+    def test_default_unhashable(self):
         d = TestClass(list, [(1, 'one'), (2, 'two'), ([1, 2], 'one two'), ({1: 'ONE', 2: 'TWO'}, 'ONE TWO')])
         value = d[[1, 2]]
         self.assertEqual(value, 'one two')
 
-    def test_dict_key(self):
+    def test_default_dict_key(self):
         d = TestClass(list, [(1, 'one'), (2, 'two'), ([1, 2], 'one two'), ({1: 'ONE', 2: 'TWO'}, 'ONE TWO')])
         value = d[{2: 'TWO', 1: 'ONE'}]
         self.assertEqual(value, 'ONE TWO')
 
-    def test_missing_key(self):
+    def test_default_missing_key(self):
         d = TestClass(list, [(1, 'one'), (2, 'two'), ([1, 2], 'one two'), ({1: 'ONE', 2: 'TWO'}, 'ONE TWO')])
         value = d[3]
         self.assertListEqual(value, [])
@@ -174,20 +174,20 @@ class TestDel(unittest.TestCase):
     def test_hashable(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), ([1, 2], 'one two')])
         del d[1]
-        self.assertListEqual([2, [1, 2]], list(d.keys()))
-        self.assertListEqual(['two', 'one two'], list(d.values()))
+        self.assertListEqual([2, [1, 2]], d._get_keys_list())
+        self.assertListEqual(['two', 'one two'], d._get_values_list())
 
     def test_unhashable(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), ([1, 2], 'one two')])
         del d[[1, 2]]
-        self.assertListEqual([1, 2], list(d.keys()))
-        self.assertListEqual(['one', 'two'], list(d.values()))
+        self.assertListEqual([1, 2], d._get_keys_list())
+        self.assertListEqual(['one', 'two'], d._get_values_list())
 
     def test_dict_key(self):
         d = TestClass(None, [({1: 'one', 2: 'two'}, 12), ({4: 'four', 3: 'three'}, 43)])
         del d[{3: 'three', 4: 'four'}]
-        self.assertListEqual([{2: 'two', 1: 'one'}], list(d.keys()))
-        self.assertListEqual([12], list(d.values()))
+        self.assertListEqual([{2: 'two', 1: 'one'}], d._get_keys_list())
+        self.assertListEqual([12], d._get_values_list())
         
     def test_key_error(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), ([1, 2], 'one two')])
@@ -200,55 +200,55 @@ class TestDel(unittest.TestCase):
 class TestKeysMethod(unittest.TestCase):
     def test_hashable(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), (3, 'three')])
-        self.assertListEqual([1, 2, 3], list(d.keys()))
+        self.assertListEqual([1, 2, 3], d._get_keys_list())
 
     def test_unhashable(self):
         d = TestClass(None, [([1, 1], 'one'), ([2, 8], 'two'), ([3, 9], 'three')])
-        self.assertListEqual([[1, 1], [2, 8], [3, 9]], list(d.keys()))
+        self.assertListEqual([[1, 1], [2, 8], [3, 9]], d._get_keys_list())
 
     def test_mix(self):
         d = TestClass(None, [(1, 'one'), ([2, 2], 'two two'), (2, 'two')])
-        self.assertListEqual([1, [2, 2], 2], list(d.keys()))
+        self.assertListEqual([1, [2, 2], 2], d._get_keys_list())
 
     def test_empty(self):
         d = TestClass(None, [])
-        self.assertListEqual([], list(d.keys()))
+        self.assertListEqual([], d._get_keys_list())
 
 
 class TestValuesMethod(unittest.TestCase):
     def test_hashable(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), (3, 'three')])
-        self.assertListEqual(['one', 'two', 'three'], list(d.values()))
+        self.assertListEqual(['one', 'two', 'three'], d._get_values_list())
 
     def test_unhashable(self):
         d = TestClass(None, [([1, 1], 'one'), ([2, 8], 'two'), ([3, 9], 'three')])
-        self.assertListEqual(['one', 'two', 'three'], list(d.values()))
+        self.assertListEqual(['one', 'two', 'three'], d._get_values_list())
 
     def test_mix(self):
         d = TestClass(None, [(1, 'one'), ([2, 2], 'two two'), (2, 'two')])
-        self.assertListEqual(['one', 'two two', 'two'], list(d.values()))
+        self.assertListEqual(['one', 'two two', 'two'], d._get_values_list())
 
     def test_empty(self):
         d = TestClass(None, [])
-        self.assertListEqual([], list(d.keys()))
+        self.assertListEqual([], d._get_keys_list())
 
 
 class TestItemsMethod(unittest.TestCase):
     def test_hashable(self):
         d = TestClass(None, [(1, 'one'), (2, 'two'), (3, 'three')])
-        self.assertListEqual([(1, 'one'), (2, 'two'), (3, 'three')], list(d.items()))
+        self.assertListEqual([(1, 'one'), (2, 'two'), (3, 'three')], d._get_items_list())
 
     def test_unhashable(self):
         d = TestClass(None, [([1, 1], 'one'), ([2, 8], 'two'), ([3, 9], 'three')])
-        self.assertListEqual([([1, 1], 'one'), ([2, 8], 'two'), ([3, 9], 'three')], list(d.items()))
+        self.assertListEqual([([1, 1], 'one'), ([2, 8], 'two'), ([3, 9], 'three')], d._get_items_list())
 
     def test_mix(self):
         d = TestClass(None, [(1, 'one'), ([2, 2], 'two two'), (2, 'two')])
-        self.assertListEqual([(1, 'one'), ([2, 2], 'two two'), (2, 'two')], list(d.items()))
+        self.assertListEqual([(1, 'one'), ([2, 2], 'two two'), (2, 'two')], d._get_items_list())
 
     def test_empty(self):
         d = TestClass(None, [])
-        self.assertListEqual([], list(d.items()))
+        self.assertListEqual([], d._get_items_list())
 
 
 class TestGetMethod(unittest.TestCase):

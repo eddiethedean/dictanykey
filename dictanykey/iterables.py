@@ -6,7 +6,7 @@ from dictanykey.iterators import DictItemIterator, DictKeyIterator, DictValueIte
 class AnyKeyMapping(Protocol):
     def __len__(self) -> int:
         ...
-        
+
     def _get_keys_list(self) -> list:
         ...
 
@@ -35,7 +35,7 @@ class DictKeys(View):
     
     def __repr__(self) -> str:
         return f'DictKeys({self.parent._get_keys_list()})'
-    
+
     
 class DictValues(View):
     def __contains__(self, value):
