@@ -1,8 +1,9 @@
-from typing import Any, Iterator, Mapping, Optional, Iterable
+from typing import Any, Iterator, Mapping, Optional, Iterable, Union, List
 from dictanykey.iterables import DictItems, DictKeys, DictValues, OrderedKeys
 
 from dictanykey.unhashmap import UnHashMap
-import dictanykey.anykey_utils as utils
+from dictanykey.utils import quote_string
+
 
 class DictAnyKey:
     """A dictionary where the keys don't need to be hashable
@@ -14,14 +15,17 @@ class DictAnyKey:
        Unhashable key lookups are slower than built in dict.
        Hashable key lookups are the same speed as built in dict.
     """
-    def __init__(self, data: Optional[Iterable | Mapping] = None) -> None:
+    def __init__(self, data: Optional[Union[Iterable, Mapping]] = None) -> None:
         self._hashmap: dict = {}
         self._unhashmap = UnHashMap()
         self._keys = OrderedKeys()
         self.update(data)
 
     def __getitem__(self, key: Any) -> Any:
-        return utils.anykey_getitem(self, key)
+        if key in self._get_keys_list():
+            return self.get(key)
+        else:
+            raise KeyError(key)
         
     def __contains__(self, value: Any) -> bool:
         return value in self._keys
@@ -34,10 +38,11 @@ class DictAnyKey:
         self._keys.add(key)
 
     def __len__(self) -> int:
-        return utils.anykey_len(self)
+        return len(self._get_keys_list())
 
     def __str__(self) -> str:
-        return utils.anykey_str(self)
+        s = ', '.join(f'{quote_string(key)}: {quote_string(value)}' for key, value in self._get_items_list())
+        return '{' + f'{s}' + '}'
         
     def __delitem__(self, key: Any) -> None:
         try:
@@ -50,18 +55,27 @@ class DictAnyKey:
         return f'DictAnyKey({[(key, value) for key, value in self._get_items_list()]})'
 
     def __iter__(self) -> Iterator:
-        return utils.anykey_iter(self)
+        return iter(self._get_keys_list())
 
     def __eq__(self, other: Mapping) -> bool:
-        return utils.anykey_eq(self, other)
+        if not {'__len__', '__contains__', '__getitem__'}.issubset(dir(other)):
+            return False
+        if len(self) != len(other):
+            return False
+        for key in self._get_keys_list():
+            if key not in other:
+                return False
+            if self[key] != other[key]:
+                return False
+        return True
 
-    def _get_keys_list(self) -> list[Any]:
+    def _get_keys_list(self) -> List[Any]:
         return list(self._keys)
 
-    def _get_values_list(self) -> list[Any]:
+    def _get_values_list(self) -> List[Any]:
         return [self[key] for key in self._get_keys_list()]
 
-    def _get_items_list(self) -> list[tuple]:
+    def _get_items_list(self) -> List[tuple]:
         return [(key, self[key]) for key in self._get_keys_list()]
     
     def keys(self) -> DictKeys:
@@ -85,12 +99,20 @@ class DictAnyKey:
             except KeyError:
                 return default
 
-    def update(self, data: Optional[Iterable | Mapping] = None) -> None:
+    def update(self, data: Optional[Union[Iterable, Mapping]] = None) -> None:
         """Update dict from dict/iterable data.
            If data is present and has a .keys() method, then does:  for k in data: self[k] = data[k]
            If data is present and lacks a .keys() method, then does:  for k, v in data: self[k] = v
         """
-        utils.anykey_update(self, data)
+        if data is None:
+            return
+
+        if isinstance(data, Mapping):
+            for k in data.keys():
+                self[k] = data[k]
+        else:
+            for k, v in data:
+                self[k] = v
 
     def clear(self):
         """Remove all items from self."""
@@ -99,16 +121,19 @@ class DictAnyKey:
         self._keys = OrderedKeys()
 
     def copy(self):
-        return utils.anykey_copy(self)
+        return type(self)(self._get_items_list())
 
     def setdefault(self, key: Any, default: Optional[Any] = None) -> Any:
         """Insert key with a value of default if key is not in the dictionary.
 
-           Return the value for key if key is in the dictionary, else default.
+            Return the value for key if key is in the dictionary, else default.
         """
-        return utils.anykey_setdefault(self, key, default)
+        if key not in self:
+            self[key] = default
+            return default
+        return key
 
-    # TODO: pop method
+    # TODO: pop method tests
     def pop(self, key: Any, default=None):
         """Docstring:
         D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
@@ -124,19 +149,29 @@ class DictAnyKey:
                 return default
         del self[key]
 
-    # TODO: popitem method
+    # TODO: popitem tests
     def popitem(self):
-        raise NotImplementedError
         """Docstring:
         Remove and return a (key, value) pair as a 2-tuple.
 
         Pairs are returned in LIFO (last-in, first-out) order.
         Raises KeyError if the dict is empty.
         """
+        if len(self) == 0:
+            raise KeyError('popitem(): dictionary is empty')
+        last_key = self._get_keys_list()[-1]
+        item = self[last_key]
+        del self[last_key]
+        return item
 
-    # TODO: fromkeys method
-    def fromkeys(self, iterable, value: Optional[Any] = None):
-        raise NotImplementedError
+    # TODO: fromkeys tests
+    @classmethod
+    def fromkeys(cls, iterable, value: Optional[Any] = None):
         """Signature: d.fromkeys(iterable, value=None, /)
         Docstring: Create a new dictionary with keys from iterable and values set to value.
         """
+        new = cls()
+        for key in iterable:
+            new[key] = value
+        return new
+

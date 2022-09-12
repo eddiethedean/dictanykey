@@ -7,7 +7,7 @@ README = (HERE / "README.md").read_text()
 
 setup(
     name="dictanykey",
-    version="0.0.2",
+    version="0.0.3",
     description="A dict that can use unhashable keys",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -18,10 +18,10 @@ setup(
     classifiers=[
         "License :: OSI Approved :: MIT License",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.6",
     ],
     packages=find_packages(),
     include_package_data=True,
-    python_requires='>=3.10',
+    python_requires='>=3.6',
     install_requires=list()
 )

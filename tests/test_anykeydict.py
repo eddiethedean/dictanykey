@@ -268,3 +268,9 @@ class TestCopyMethod(unittest.TestCase):
         d = TestClass([(1, 'one'), ([2, 2], 'two two'), (2, 'two')])
         c = d.copy()
         self.assertTrue(d == c)
+
+
+class TestPopMethod(unittest.TestCase):
+    def test_hashable(self):
+        d = TestClass([(1, 'one'), (2, 'two'), (3, 'three')])
+        value = d.pop(1)

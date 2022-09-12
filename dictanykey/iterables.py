@@ -1,24 +1,10 @@
-from typing import Iterable, Iterator, Any, Optional, Protocol
+from typing import Iterable, Iterator, Any, Mapping, Optional
 
 from dictanykey.iterators import DictItemIterator, DictKeyIterator, DictValueIterator
 
 
-class AnyKeyMapping(Protocol):
-    def __len__(self) -> int:
-        ...
-
-    def _get_keys_list(self) -> list:
-        ...
-
-    def _get_values_list(self) -> list:
-        ...
-
-    def _get_items_list(self) -> list[tuple]:
-        ...
-
-
 class View:
-    def __init__(self, parent: AnyKeyMapping) -> None:
+    def __init__(self, parent: Mapping) -> None:
         self.parent = parent
 
     def __len__(self) -> int:

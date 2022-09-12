@@ -1,6 +1,5 @@
-from typing import Any, Iterable, Iterator, Mapping, Optional
+from typing import Any, List, Optional
 from dictanykey.iterables import DictItems, DictKeys, DictValues
-from dictanykey.anykey_utils import anykey_copy, anykey_eq, anykey_getitem, anykey_iter, anykey_len, anykey_setdefault, anykey_str, anykey_update
 
 
 class UnHashMap:
@@ -13,11 +12,13 @@ class UnHashMap:
        Much slower key lookup speeds compared to dict but
        keys don't need to be hashable.
     """
-    def __init__(self, data: Optional[Iterable] = None) -> None:
+    def __init__(self, data: Optional[List[tuple]] = None) -> None:
         """Initialize self.  See help(type(self)) for accurate signature."""
         self._keys: list = []
         self._values: list = []
-        self.update(data)
+        if data is not None:
+            for key, value in data:
+                self[key] = value
 
     def __contains__(self, value: Any) -> bool:
         """True if the dictionary has the specified key, else False."""
@@ -32,20 +33,14 @@ class UnHashMap:
             i = self._getindex(key)
             self._values[i] = value
 
-    def __getitem__(self, key: Any) -> Any:
-        return anykey_getitem(self, key)
-
     def __len__(self) -> int:
-        return anykey_len(self)
+        return len(self._keys)
 
-    def __str__(self) -> str:
-        return anykey_str(self)
-
-    def __iter__(self) -> Iterator:
-        return anykey_iter(self)
-
-    def __eq__(self, other: Mapping) -> bool:
-        return anykey_eq(self, other)
+    def __getitem__(self, key: Any) -> Any:
+        if key in self._keys:
+            return self.get(key)
+        else:
+            raise KeyError(key)
             
     def _getindex(self, key: Any) -> int:
         """Use _keys.index method to look up and return index of key.
@@ -56,13 +51,13 @@ class UnHashMap:
         except ValueError as e:
             raise KeyError(key)
 
-    def _get_keys_list(self) -> list[Any]:
+    def _get_keys_list(self) -> List[Any]:
         return self._keys
 
-    def _get_values_list(self) -> list[Any]:
+    def _get_values_list(self) -> List[Any]:
         return [self[key] for key in self._get_keys_list()]
 
-    def _get_items_list(self) -> list[tuple]:
+    def _get_items_list(self) -> List[tuple]:
         return [(key, self[key]) for key in self._get_keys_list()]
         
     def __delitem__(self, key: Any) -> None:
@@ -94,16 +89,3 @@ class UnHashMap:
         except KeyError:
             return default
         return self._values[i]
-
-    def update(self, data) -> None:
-        anykey_update(self, data)
-    
-    def clear(self):
-        self._keys: list = []
-        self._values: list = []
-
-    def copy(self):
-        return anykey_copy(self)
-
-    def setdefault(self, key: Any, default: Optional[Any] = None) -> Any:
-        return anykey_setdefault(self, key, default)

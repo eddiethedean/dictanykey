@@ -26,50 +26,6 @@ class TestLen(unittest.TestCase):
     def test_empty(self):
         d = TestClass()
         self.assertEqual(len(d), 0)
-
-
-class TestIter(unittest.TestCase):
-    def test_hashable(self):
-        d = TestClass([(1, 'one'), (2, 'two'), (3, 'three')])
-        iterator = iter(d)
-        zero = next(iterator)
-        self.assertEqual(zero, 1)
-        one = next(iterator)
-        self.assertEqual(one, 2)
-        two = next(iterator)
-        self.assertEqual(two, 3)
-        with self.assertRaises(StopIteration):
-            next(iterator)
-
-    def test_unhashable(self):
-        d = TestClass([([1], 'one'), ([2], 'two'), ([1, 2], 'one two')])
-        iterator = iter(d)
-        zero = next(iterator)
-        self.assertEqual(zero, [1])
-        one = next(iterator)
-        self.assertEqual(one, [2])
-        two = next(iterator)
-        self.assertEqual(two, [1, 2])
-        with self.assertRaises(StopIteration):
-            next(iterator)
-
-    def test_mix(self):
-        d = TestClass([(1, 'one'), (2, 'two'), ([1, 2], 'one two')])
-        iterator = iter(d)
-        zero = next(iterator)
-        self.assertEqual(zero, 1)
-        one = next(iterator)
-        self.assertEqual(one, 2)
-        two = next(iterator)
-        self.assertEqual(two, [1, 2])
-        with self.assertRaises(StopIteration):
-            next(iterator)
-
-    def test_empty(self):
-        d = TestClass()
-        iterator = iter(d)
-        with self.assertRaises(StopIteration):
-            next(iterator)
     
 
 class TestContains(unittest.TestCase):
@@ -244,20 +200,3 @@ class TestGetMethod(unittest.TestCase):
         self.assertEqual(value, 'NaN')
         value = TestGetItem.d.get({1: 'ONE'}, 'Missing')
         self.assertEqual(value, 'Missing')
-
-
-class TestCopyMethod(unittest.TestCase):
-    def test_hashable(self):
-        d = TestClass([(1, 'one'), (2, 'two'), (3, 'three')])
-        c = d.copy()
-        self.assertTrue(d == c)
-
-    def test_unhashable(self):
-        d = TestClass([([1, 1], 'one'), ([2, 8], 'two'), ([3, 9], 'three')])
-        c = d.copy()
-        self.assertTrue(d == c)
-
-    def test_mix(self):
-        d = TestClass([(1, 'one'), ([2, 2], 'two two'), (2, 'two')])
-        c = d.copy()
-        self.assertTrue(d == c)

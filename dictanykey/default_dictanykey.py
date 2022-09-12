@@ -14,7 +14,7 @@ class DefaultDictAnyKey(DictAnyKey):
     """
     def __init__(
         self,
-        default_factory: Optional[Callable] = None, /,
+        default_factory: Optional[Callable] = None,
         data: Optional[Iterable] = None
     ) -> None:
         """Initialize self.  See help(type(self)) for accurate signature."""
