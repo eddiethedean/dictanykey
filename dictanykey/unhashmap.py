@@ -72,15 +72,15 @@ class UnHashMap:
     
     def keys(self) -> DictKeys:
         """Returns a set-like object providing a view on self's keys"""
-        return DictKeys(self)
+        return DictKeys(self)  # type: ignore 
     
     def values(self) -> DictValues:
         """Returns an object providing a view on self's values"""
-        return DictValues(self)
+        return DictValues(self)  # type: ignore 
     
     def items(self) -> DictItems:
         """Returns set-like object providing a view on self's items"""
-        return DictItems(self)
+        return DictItems(self)  # type: ignore 
     
     def get(self, key, default: Optional[Any] = None) -> Any:
         """Return the value for key if key is in the dictionary, else default."""

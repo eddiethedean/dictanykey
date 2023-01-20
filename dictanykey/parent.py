@@ -1,7 +1,4 @@
-from typing import Protocol
-
-
-class Parent(Protocol):
+class Parent:
     def _get_keys_list(self) -> list:
         ...
 

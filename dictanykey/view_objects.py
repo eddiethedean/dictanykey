@@ -21,7 +21,7 @@ class DictKeysView(View):
         return key in self.map.keys()
     
     def __reversed__(self) -> Iterator:
-        return reversed(self.map.keys())
+        return reversed(self.map.keys()) # type: ignore 
 
 
 class DictValuesView(View):
@@ -35,7 +35,7 @@ class DictValuesView(View):
         return value in self.map.values()
     
     def __reversed__(self) -> Iterator:
-        return reversed(self.map.keys())
+        return reversed(self.map.keys()) # type: ignore 
 
 
 class DictItemsView(View):
@@ -49,4 +49,4 @@ class DictItemsView(View):
         return item in self.map.items()
     
     def __reversed__(self) -> Iterator:
-        return reversed(self.map.keys())
+        return reversed(self.map.keys()) # type: ignore 

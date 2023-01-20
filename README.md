@@ -22,7 +22,7 @@ pip install dictanykey
 ```
 
 ## Dependencies
-- [python >= 3.8]
+- [python >= 3.6]
 
 ## Example
 ```sh

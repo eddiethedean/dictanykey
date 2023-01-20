@@ -79,13 +79,13 @@ class DictAnyKey:
         return [(key, self[key]) for key in self._get_keys_list()]
     
     def keys(self) -> DictKeys:
-        return DictKeys(self)
-   
+        return DictKeys(self)  # type: ignore 
+  
     def values(self) -> DictValues:
-        return DictValues(self)
+        return DictValues(self)  # type: ignore 
     
     def items(self) -> DictItems:
-        return DictItems(self)
+        return DictItems(self)  # type: ignore 
     
     def get(self, key: Any, default: Optional[Any] = None) -> Any:
         """Return the value for key if key is in the dictionary, else default."""
