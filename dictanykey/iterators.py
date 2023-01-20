@@ -1,9 +1,11 @@
-from typing import Any, Iterable, Iterator, Mapping
+from typing import Any, Iterator
+
+from dictanykey.parent import Parent
 
 
 class DictKeyIterator:
-    def __init__(self, parent: Mapping) -> None:
-        self.parent: Mapping = parent
+    def __init__(self, parent: Parent) -> None:
+        self.parent = parent
         self.len: int = len(parent)
         self.iterator: Iterator = iter(parent._get_keys_list())
 
@@ -17,8 +19,8 @@ class DictKeyIterator:
     
     
 class DictValueIterator:
-    def __init__(self, parent: Mapping) -> None:
-        self.parent: Mapping = parent
+    def __init__(self, parent: Parent) -> None:
+        self.parent = parent
         self.len: int = len(parent)
         self.iterator: Iterator = iter(parent._get_values_list())
 
@@ -32,8 +34,8 @@ class DictValueIterator:
     
     
 class DictItemIterator:
-    def __init__(self, parent: Mapping):
-        self.parent: Mapping = parent
+    def __init__(self, parent: Parent):
+        self.parent = parent
         self.len: int = len(parent)
         self.iterator: Iterator = iter(parent._get_items_list())
 

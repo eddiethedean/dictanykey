@@ -1,10 +1,11 @@
-from typing import Iterable, Iterator, Any, Mapping, Optional
+from typing import Iterable, Iterator, Any, Optional
 
 from dictanykey.iterators import DictItemIterator, DictKeyIterator, DictValueIterator
+from dictanykey.parent import Parent
 
 
 class View:
-    def __init__(self, parent: Mapping) -> None:
+    def __init__(self, parent: Parent) -> None:
         self.parent = parent
 
     def __len__(self) -> int:
@@ -18,7 +19,7 @@ class DictKeys(View):
 
     def __iter__(self) -> DictKeyIterator:
         return DictKeyIterator(self.parent)
-    
+
     def __repr__(self) -> str:
         return f'DictKeys({self.parent._get_keys_list()})'
 
@@ -39,7 +40,7 @@ class DictItems(View):
         return item in self.parent._get_items_list()
 
     def __iter__(self):
-        return DictItemIterator(self.parent)
+        return DictItemIterator(self.parent)  
     
     def __repr__(self):
         return f'DictItems({self.parent._get_items_list()})'
