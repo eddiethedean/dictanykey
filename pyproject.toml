@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dictanykey"
-version = "0.1.2"
+version = "0.1.3"
 description = "A dict that can use unhashable keys"
 readme = "README.md"
 license = "MIT"

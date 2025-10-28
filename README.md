@@ -42,17 +42,22 @@ d["hello"] = "world"
 d[[1, 2, 3]] = "list key"
 d[{"nested": "dict"}] = "dict key"
 
-print(d)  # {1: "one", "hello": "world", [1, 2, 3]: "list key", {"nested": "dict"}: "dict key"}
+print(d)  # {1: 'one', 'hello': 'world', [1, 2, 3]: 'list key', {'nested': 'dict'}: 'dict key'}
 
 # All standard dictionary operations work
 print(len(d))           # 4
 print(1 in d)           # True
 print([1, 2, 3] in d)   # True
-print(d.get("missing", "default"))  # "default"
+print(d.get("missing", "default"))  # default
 
 # Iteration preserves insertion order
 for key, value in d.items():
     print(f"{key}: {value}")
+# Output:
+#   1: one
+#   hello: world
+#   [1, 2, 3]: list key
+#   {'nested': 'dict'}: dict key
 ```
 
 ### Advanced Features
@@ -64,17 +69,18 @@ for key, value in d.items():
 frozen = FrozenDictAnyKey({1: "one", (1, 2): "tuple"})
 
 # Read operations work normally
-print(frozen[1])  # "one"
+print(frozen[1])  # one
 
 # Mutation operations raise errors
 try:
     frozen[2] = "two"  # Raises TypeError
 except TypeError:
-    print("Cannot modify frozen dictionary")
+    print("Cannot modify frozen dictionary")  # Cannot modify frozen dictionary
 
 # Can be used as dictionary keys (if all keys are hashable)
 if all(isinstance(k, (int, str, tuple)) for k in frozen.keys()):
     other_dict = {frozen: "value"}
+    print(other_dict)  # {FrozenDictAnyKey([(1, 'one'), ((1, 2), 'tuple')]): 'value'}
 ```
 
 #### DefaultDictAnyKey
@@ -85,7 +91,7 @@ dd = DefaultDictAnyKey(list)  # Default to empty list
 
 # Missing keys automatically get default value
 dd["new_key"].append("item")
-print(dd["new_key"])  # ["item"]
+print(dd["new_key"])  # ['item']
 
 # Works with any callable
 dd_int = DefaultDictAnyKey(lambda: 0)
@@ -100,7 +106,7 @@ print(dd_int["count"])  # 1
 data = [1, 2, 2, 3, 3, 3, "a", "a", "b"]
 counts = value_counts(data)
 
-print(counts)  # DictAnyKey({1: 1, 'b': 1, 2: 2, 'a': 2, 3: 3})
+print(counts)  # {1: 1, 'b': 1, 2: 2, 'a': 2, 3: 3}
 
 # Sort options
 counts_asc = value_counts(data, ascending=True)   # Lowest to highest
@@ -114,7 +120,7 @@ print(counts_unsorted)  # {1: 1, 2: 2, 3: 3, 'a': 2, 'b': 1}
 # Works with unhashable values too!
 unhashable_data = [[1, 2], [1, 2], [3, 4], [1, 2]]
 unhashable_counts = value_counts(unhashable_data)
-print(unhashable_counts)  # DictAnyKey({[1, 2]: 3, [3, 4]: 1})
+print(unhashable_counts)  # {[3, 4]: 1, [1, 2]: 3}
 ```
 
 ## 📋 Requirements
