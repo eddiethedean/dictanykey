@@ -1,4 +1,5 @@
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from dictanykey.parent import Parent
 
@@ -9,40 +10,40 @@ class DictKeyIterator:
         self.len: int = len(parent)
         self.iterator: Iterator = iter(parent._get_keys_list())
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         return self
 
     def __next__(self) -> Any:
         if len(self.parent) != self.len:
-            raise RuntimeError('dictionary changed size during iteration')
+            raise RuntimeError("dictionary changed size during iteration")
         return next(self.iterator)
-    
-    
+
+
 class DictValueIterator:
     def __init__(self, parent: Parent) -> None:
         self.parent = parent
         self.len: int = len(parent)
         self.iterator: Iterator = iter(parent._get_values_list())
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[Any]:
         return self
 
     def __next__(self) -> Any:
         if len(self.parent) != self.len:
-            raise RuntimeError('dictionary changed size during iteration')
+            raise RuntimeError("dictionary changed size during iteration")
         return next(self.iterator)
-    
-    
+
+
 class DictItemIterator:
-    def __init__(self, parent: Parent):
+    def __init__(self, parent: Parent) -> None:
         self.parent = parent
         self.len: int = len(parent)
         self.iterator: Iterator = iter(parent._get_items_list())
 
-    def __iter__(self):
+    def __iter__(self) -> Iterator[tuple[Any, Any]]:
         return self
 
-    def __next__(self) -> Any:
+    def __next__(self) -> tuple[Any, Any]:
         if len(self.parent) != self.len:
-            raise RuntimeError('dictionary changed size during iteration')
-        return next(self.iterator)
+            raise RuntimeError("dictionary changed size during iteration")
+        return next(self.iterator)  # type: ignore

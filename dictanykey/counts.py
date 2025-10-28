@@ -1,13 +1,12 @@
-from typing import Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from dictanykey.default_dictanykey import DefaultDictAnyKey
 from dictanykey.dictanykey import DictAnyKey
 
 
 def value_counts(
-   values: Iterable,
-   sort=True,
-   ascending=True
+    values: Iterable[Any], sort: bool = True, ascending: bool = True
 ) -> DictAnyKey:
     """
     Count up each value.
@@ -19,7 +18,7 @@ def value_counts(
     values :
         values to be counted up
     sort : default True, sort results by counts
-    ascending: default True, sort highest to lowest
+    ascending: default False, sort highest to lowest
 
 
     Returns
@@ -37,8 +36,12 @@ def value_counts(
     for value in values:
         d[value] += 1
     if sort:
-        return DictAnyKey(sorted(d.items(),  # type: ignore
-                                 key=lambda item: item[1],  # type: ignore
-                                 reverse=ascending))
+        return DictAnyKey(
+            sorted(
+                d.items(),
+                key=lambda item: item[1],
+                reverse=not ascending,
+            )
+        )
     else:
         return DictAnyKey(d)

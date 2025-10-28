@@ -1,20 +1,22 @@
-from typing import Any, Iterator, Mapping, Optional, Iterable, Union, List
-from dictanykey.iterables import DictItems, DictKeys, DictValues, OrderedKeys
+from collections.abc import Iterable, Iterator, Mapping, MutableMapping
+from typing import Any, Optional, Union
 
+from dictanykey.iterables import DictItems, DictKeys, DictValues, OrderedKeys
 from dictanykey.unhashmap import UnHashMap
 from dictanykey.utils import quote_string
 
 
-class DictAnyKey:
+class DictAnyKey(MutableMapping[Any, Any]):
     """A dictionary where the keys don't need to be hashable
-       Stores hashable keys with values in _hashmap: dict
-       Stores unhashable keys with values in _unhashmap: UnHashMap
+    Stores hashable keys with values in _hashmap: dict
+    Stores unhashable keys with values in _unhashmap: UnHashMap
 
-       Maintains order of items inserted.
+    Maintains order of items inserted.
 
-       Unhashable key lookups are slower than built in dict.
-       Hashable key lookups are the same speed as built in dict.
+    Unhashable key lookups are slower than built in dict.
+    Hashable key lookups are the same speed as built in dict.
     """
+
     def __init__(self, data: Optional[Union[Iterable, Mapping]] = None) -> None:
         self._hashmap: dict = {}
         self._unhashmap = UnHashMap()
@@ -22,14 +24,14 @@ class DictAnyKey:
         self.update(data)
 
     def __getitem__(self, key: Any) -> Any:
-        if key in self._get_keys_list():
+        if key in self._keys:
             return self.get(key)
         else:
             raise KeyError(key)
-        
+
     def __contains__(self, value: Any) -> bool:
         return value in self._keys
-    
+
     def __setitem__(self, key: Any, value: Any) -> None:
         try:
             self._hashmap[key] = value
@@ -38,12 +40,15 @@ class DictAnyKey:
         self._keys.add(key)
 
     def __len__(self) -> int:
-        return len(self._get_keys_list())
+        return len(self._keys)
 
     def __str__(self) -> str:
-        s = ', '.join(f'{quote_string(key)}: {quote_string(value)}' for key, value in self._get_items_list())
-        return '{' + f'{s}' + '}'
-        
+        s = ", ".join(
+            f"{quote_string(key)}: {quote_string(value)}"
+            for key, value in self._get_items_list()
+        )
+        return "{" + f"{s}" + "}"
+
     def __delitem__(self, key: Any) -> None:
         try:
             del self._hashmap[key]
@@ -52,44 +57,44 @@ class DictAnyKey:
         self._keys.delete(key)
 
     def __repr__(self) -> str:
-        return f'DictAnyKey({[(key, value) for key, value in self._get_items_list()]})'
+        return f"DictAnyKey({[(key, value) for key, value in self._get_items_list()]})"
 
     def __iter__(self) -> Iterator:
         return iter(self._get_keys_list())
 
-    def __eq__(self, other: Mapping) -> bool:
-        if not {'__len__', '__contains__', '__getitem__'}.issubset(dir(other)):
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Mapping):
             return False
         if len(self) != len(other):
             return False
-        for key in self._get_keys_list():
+        for key in self._keys:
             if key not in other:
                 return False
             if self[key] != other[key]:
                 return False
         return True
 
-    def _get_keys_list(self) -> List[Any]:
+    def _get_keys_list(self) -> list[Any]:
         return list(self._keys)
 
-    def _get_values_list(self) -> List[Any]:
+    def _get_values_list(self) -> list[Any]:
         return [self[key] for key in self._get_keys_list()]
 
-    def _get_items_list(self) -> List[tuple]:
+    def _get_items_list(self) -> list[tuple]:
         return [(key, self[key]) for key in self._get_keys_list()]
-    
-    def keys(self) -> DictKeys:
-        return DictKeys(self)  # type: ignore 
-  
-    def values(self) -> DictValues:
-        return DictValues(self)  # type: ignore 
-    
-    def items(self) -> DictItems:
-        return DictItems(self)  # type: ignore 
-    
+
+    def keys(self) -> DictKeys:  # type: ignore
+        return DictKeys(self)  # type: ignore
+
+    def values(self) -> DictValues:  # type: ignore
+        return DictValues(self)  # type: ignore
+
+    def items(self) -> DictItems:  # type: ignore
+        return DictItems(self)  # type: ignore
+
     def get(self, key: Any, default: Optional[Any] = None) -> Any:
         """Return the value for key if key is in the dictionary, else default."""
-        if key not in self._get_keys_list():
+        if key not in self._keys:
             return default
         try:
             return self._hashmap[key]
@@ -99,10 +104,10 @@ class DictAnyKey:
             except KeyError:
                 return default
 
-    def update(self, data: Optional[Union[Iterable, Mapping]] = None) -> None:
+    def update(self, data: Optional[Union[Iterable, Mapping]] = None) -> None:  # type: ignore
         """Update dict from dict/iterable data.
-           If data is present and has a .keys() method, then does:  for k in data: self[k] = data[k]
-           If data is present and lacks a .keys() method, then does:  for k, v in data: self[k] = v
+        If data is present and has a .keys() method, then does:  for k in data: self[k] = data[k]
+        If data is present and lacks a .keys() method, then does:  for k, v in data: self[k] = v
         """
         if data is None:
             return
@@ -114,27 +119,27 @@ class DictAnyKey:
             for k, v in data:
                 self[k] = v
 
-    def clear(self):
+    def clear(self) -> None:
         """Remove all items from self."""
-        self._hashmap: dict = {}
+        self._hashmap.clear()
         self._unhashmap = UnHashMap()
         self._keys = OrderedKeys()
 
-    def copy(self):
+    def copy(self) -> "DictAnyKey":
         return type(self)(self._get_items_list())
 
     def setdefault(self, key: Any, default: Optional[Any] = None) -> Any:
         """Insert key with a value of default if key is not in the dictionary.
 
-            Return the value for key if key is in the dictionary, else default.
+        Return the value for key if key is in the dictionary, else default.
         """
         if key not in self:
             self[key] = default
             return default
-        return key
+        return self[key]
 
     # TODO: pop method tests
-    def pop(self, key: Any, default=None):
+    def pop(self, key: Any, default: Optional[Any] = None) -> Any:
         """Docstring:
         D.pop(k[,d]) -> v, remove specified key and return the corresponding value.
 
@@ -148,9 +153,10 @@ class DictAnyKey:
             else:
                 return default
         del self[key]
+        return value
 
     # TODO: popitem tests
-    def popitem(self):
+    def popitem(self) -> tuple[Any, Any]:
         """Docstring:
         Remove and return a (key, value) pair as a 2-tuple.
 
@@ -158,15 +164,17 @@ class DictAnyKey:
         Raises KeyError if the dict is empty.
         """
         if len(self) == 0:
-            raise KeyError('popitem(): dictionary is empty')
+            raise KeyError("popitem(): dictionary is empty")
         last_key = self._get_keys_list()[-1]
         item = self[last_key]
         del self[last_key]
-        return item
+        return (last_key, item)
 
     # TODO: fromkeys tests
     @classmethod
-    def fromkeys(cls, iterable, value: Optional[Any] = None):
+    def fromkeys(
+        cls, iterable: Iterable[Any], value: Optional[Any] = None
+    ) -> "DictAnyKey":
         """Signature: d.fromkeys(iterable, value=None, /)
         Docstring: Create a new dictionary with keys from iterable and values set to value.
         """
@@ -174,4 +182,3 @@ class DictAnyKey:
         for key in iterable:
             new[key] = value
         return new
-
