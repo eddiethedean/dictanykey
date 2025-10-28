@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dictanykey"
-version = "0.1.1"
+version = "0.1.2"
 description = "A dict that can use unhashable keys"
 readme = "README.md"
-license = {text = "MIT"}
+license = "MIT"
 authors = [
     {name = "Odos Matthews", email = "odosmatthews@gmail.com"}
 ]
@@ -18,7 +18,6 @@ keywords = ["dictionary", "unhashable", "keys", "data-structure"]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.9",
